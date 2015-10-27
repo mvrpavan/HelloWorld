@@ -1,6 +1,7 @@
 package com.android.apps.helloworld;
 
 import android.app.NotificationManager;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
@@ -13,15 +14,22 @@ import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.Switch;
+import android.widget.TabHost;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.net.Uri;
 import android.app.PendingIntent;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 import java.util.Random;
 
 
@@ -32,6 +40,12 @@ public class MainActivity extends ActionBarActivity {
     Random r1, r2, r3;
     EditText editTextShown;
     Button btnUpdateTextShown;
+    TabHost tabHost;
+    List<UserAction> ListUserActions;
+    ListView ListViewUserActions;
+    UserActionListAdapter userActionListAdapter;
+    Integer ActionCount;
+    Button btnClearHistory;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +62,21 @@ public class MainActivity extends ActionBarActivity {
         tvTextShown = (TextView) findViewById(R.id.tvTextShown);
         editTextShown.setEnabled(false);
         btnUpdateTextShown = (Button) findViewById(R.id.btnUpdate);
+        ListViewUserActions = (ListView) findViewById(R.id.listViewActions);
+        btnClearHistory = (Button) findViewById(R.id.btnClear);
+        ActionCount = 0;
+        ListUserActions = new ArrayList<>();
+
+        tabHost = (TabHost) findViewById(R.id.tabHost);
+        tabHost.setup();
+        TabHost.TabSpec tabSpec = tabHost.newTabSpec("helloworld");
+        tabSpec.setContent(R.id.tabHelloWorld);
+        tabSpec.setIndicator("Hello World");
+        tabHost.addTab(tabSpec);
+        tabSpec = tabHost.newTabSpec("history");
+        tabSpec.setContent(R.id.tabHistory);
+        tabSpec.setIndicator("History");
+        tabHost.addTab(tabSpec);
 
         r1 = new Random(10);
         r2 = new Random(20);
@@ -62,6 +91,7 @@ public class MainActivity extends ActionBarActivity {
                 else {
                     tvText.setTypeface(null, (Italic.isChecked() ? Typeface.ITALIC : Typeface.NORMAL));
                 }
+                addToUserActionList("Bold " + (isChecked ? "ON" : "OFF"));
             }
         });
 
@@ -74,6 +104,7 @@ public class MainActivity extends ActionBarActivity {
                 else {
                     tvText.setTypeface(null, (Bold.isChecked() ? Typeface.BOLD : Typeface.NORMAL));
                 }
+                addToUserActionList("Italic " + (isChecked ? "ON" : "OFF"));
             }
         });
 
@@ -86,6 +117,7 @@ public class MainActivity extends ActionBarActivity {
                 else {
                     tvText.setTextColor(android.graphics.Color.BLACK);
                 }
+                addToUserActionList("Color " + (isChecked ? "ON" : "OFF"));
             }
         });
 
@@ -93,6 +125,7 @@ public class MainActivity extends ActionBarActivity {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 Toast.makeText(getApplicationContext(), "Flashlight " + (isChecked ? "ON" : "OFF"), Toast.LENGTH_SHORT).show();
+                addToUserActionList("Flashlight " + (isChecked ? "ON" : "OFF"));
             }
         });
 
@@ -105,6 +138,7 @@ public class MainActivity extends ActionBarActivity {
                 } else {
                     Toast.makeText(getApplicationContext(), "Notification not shown", Toast.LENGTH_SHORT).show();
                 }
+                addToUserActionList("Notification " + (isChecked ? "ON" : "OFF"));
             }
         });
 
@@ -112,32 +146,53 @@ public class MainActivity extends ActionBarActivity {
             @Override
             public void onClick(View v) {
                 editTextShown.setTypeface(null, Typeface.NORMAL);
-                tvTextShown.setText(editTextShown.getText());
+                if (!String.valueOf(editTextShown.getText()).trim().isEmpty())
+                    tvTextShown.setText(editTextShown.getText());
                 editTextShown.setText("");
                 editTextShown.setActivated(false);
                 editTextShown.setEnabled(false);
+                addToUserActionList("Update Pressed");
+            }
+        });
+
+        btnClearHistory.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ListUserActions.clear();
+                userActionListAdapter.notifyDataSetChanged();
             }
         });
 
         registerForContextMenu(tvTextShown);
+
+        userActionListAdapter = new UserActionListAdapter();
+        ListViewUserActions.setAdapter(userActionListAdapter);
+    }
+
+    private void addToUserActionList(String ActionDesc) {
+        ListUserActions.add(new UserAction(ActionCount, new Date(), ActionDesc));
+        ActionCount++;
+        userActionListAdapter.notifyDataSetChanged();
     }
 
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
         menu.setHeaderIcon(R.mipmap.ic_launcher2);
         menu.setHeaderTitle("Edit Text");
-        menu.add(menu.NONE, 0, menu.NONE, "Edit Text");
-        menu.add(menu.NONE, 1, menu.NONE, "Clear Text");
+        menu.add(ContextMenu.NONE, 0, ContextMenu.NONE, "Edit Text");
+        menu.add(ContextMenu.NONE, 1, ContextMenu.NONE, "Clear Text");
     }
 
     public boolean onContextItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case 0:
+                addToUserActionList("Edit Text selected");
                 editTextShown.setEnabled(true);
                 editTextShown.setText(tvTextShown.getText());
                 editTextShown.setActivated(true);
                 break;
             case 1:
+                addToUserActionList("Clear Text selected");
                 tvTextShown.setText("No Text");
                 break;
         }
@@ -239,5 +294,27 @@ public class MainActivity extends ActionBarActivity {
         NotificationManager notificationManager = (NotificationManager) getSystemService(
                 NOTIFICATION_SERVICE);
         notificationManager.notify(NOTIFICATION_ID, builder.build());
+    }
+
+    private class UserActionListAdapter extends ArrayAdapter<UserAction> {
+
+        public UserActionListAdapter() {
+            super(MainActivity.this, R.layout.listview_item, ListUserActions);
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            if (convertView == null)
+                convertView = getLayoutInflater().inflate(R.layout.listview_item, parent, false);
+
+            UserAction userAction = ListUserActions.get(position);
+
+            TextView action = (TextView) convertView.findViewById(R.id.tvAction);
+            action.setText(userAction.getActionDesc());
+            TextView actionTime = (TextView) convertView.findViewById(R.id.tvActionTime);
+            actionTime.setText(userAction.getActionDate().toString());
+
+            return convertView;
+        }
     }
 }
