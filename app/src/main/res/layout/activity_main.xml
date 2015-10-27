@@ -1,0 +1,98 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin" tools:context=".MainActivity">
+
+    <TextView android:text="@string/hello_world" android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/tvText"
+        android:textSize="25dp"
+        android:textIsSelectable="false"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="35dp" />
+
+    <Switch
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Bold"
+        android:id="@+id/switchBold"
+        android:checked="false"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="103dp"
+        android:layout_alignRight="@+id/switchItalic"
+        android:layout_alignEnd="@+id/switchItalic" />
+
+    <Switch
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Italic"
+        android:id="@+id/switchItalic"
+        android:checked="false"
+        android:layout_below="@+id/switchBold"
+        android:layout_alignRight="@+id/switchColor"
+        android:layout_alignEnd="@+id/switchColor" />
+
+    <Switch
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Color"
+        android:id="@+id/switchColor"
+        android:checked="false"
+        android:layout_below="@+id/switchItalic" />
+
+    <Switch
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Flashlight"
+        android:id="@+id/switchFlashlight"
+        android:checked="false"
+        android:layout_below="@+id/switchColor"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <Switch
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Notification"
+        android:id="@+id/switchNotify"
+        android:checked="false"
+        android:layout_below="@+id/switchFlashlight"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <EditText
+        android:layout_width="100dp"
+        android:layout_height="50dp"
+        android:id="@+id/editTextShown"
+        android:layout_below="@+id/switchNotify"
+        android:layout_toRightOf="@+id/tvTextShown"
+        android:singleLine="true"
+        android:layout_toLeftOf="@+id/btnUpdate"
+        android:layout_toStartOf="@+id/btnUpdate"
+        android:inputType="textNoSuggestions" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Text Shown"
+        android:id="@+id/tvTextShown"
+        android:layout_alignBaseline="@+id/editTextShown"
+        android:layout_alignBottom="@+id/editTextShown"
+        android:layout_alignLeft="@+id/switchItalic"
+        android:layout_alignStart="@+id/switchItalic" />
+
+    <Button
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Update"
+        android:id="@+id/btnUpdate"
+        android:layout_alignBottom="@+id/editTextShown"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
+
+</RelativeLayout>
