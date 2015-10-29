@@ -7,13 +7,15 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import java.sql.Date;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by pavan on 10/28/2015.
  */
 public class DatabaseHandler extends SQLiteOpenHelper {
 
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 3;
     private static final String DATABASE_NAME = "userActions",
     TABLE_HISTORY = "History",
     KEY_ID = "id",
@@ -55,15 +57,39 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         if (cursor != null)
             cursor.moveToFirst();
 
-        UserAction userAction = new UserAction(Integer.parseInt(cursor.getString(0)), Date.valueOf(cursor.getString(1)), cursor.getString(2));
+        UserAction userAction = new UserAction(cursor.getInt(0), cursor.getString(1), cursor.getString(2));
         db.close();
         cursor.close();
         return userAction;
     }
 
+    public List<UserAction> getAllUserActions() {
+        List<UserAction> ListUserActions = new ArrayList<>();
+        SQLiteDatabase db = getReadableDatabase();
+
+        Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_HISTORY, null);
+
+        if (cursor.getCount() > 0) {
+            cursor.moveToFirst();
+            do {
+                UserAction userAction = new UserAction(cursor.getInt(0), cursor.getString(1), cursor.getString(2));
+                ListUserActions.add(userAction);
+            }while (cursor.moveToNext());
+        }
+        cursor.close();
+        db.close();
+        return ListUserActions;
+    }
+
     public void deleteUserAction(UserAction userAction) {
         SQLiteDatabase db = getWritableDatabase();
         db.delete(TABLE_HISTORY, KEY_ID + "=?", new String[]{String.valueOf(userAction.getId())});
+        db.close();
+    }
+
+    public void deleteAllUserActions() {
+        SQLiteDatabase db = getWritableDatabase();
+        db.execSQL("DELETE FROM " + TABLE_HISTORY);
         db.close();
     }
 

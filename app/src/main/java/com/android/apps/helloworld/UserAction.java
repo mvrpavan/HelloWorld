@@ -7,10 +7,10 @@ import java.util.Date;
  */
 public class UserAction {
     private Integer Id;
-    private Date ActionDate;
+    private String ActionDate;
     private String ActionDesc;
 
-    public UserAction(Integer id, Date actionDate, String actionDesc) {
+    public UserAction(Integer id, String actionDate, String actionDesc) {
         Id = id;
         ActionDate = actionDate;
         ActionDesc = actionDesc;
@@ -20,7 +20,7 @@ public class UserAction {
         return Id;
     }
 
-    public Date getActionDate() {
+    public String getActionDate() {
         return ActionDate;
     }
 

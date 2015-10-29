@@ -46,6 +46,7 @@ public class MainActivity extends ActionBarActivity {
     UserActionListAdapter userActionListAdapter;
     Integer ActionCount;
     Button btnClearHistory;
+    DatabaseHandler db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -159,18 +160,24 @@ public class MainActivity extends ActionBarActivity {
             @Override
             public void onClick(View v) {
                 ListUserActions.clear();
+                db.deleteAllUserActions();
                 userActionListAdapter.notifyDataSetChanged();
             }
         });
 
         registerForContextMenu(tvTextShown);
 
+        db = new DatabaseHandler(getApplicationContext());
+        ListUserActions.addAll(db.getAllUserActions());
+
         userActionListAdapter = new UserActionListAdapter();
         ListViewUserActions.setAdapter(userActionListAdapter);
     }
 
     private void addToUserActionList(String ActionDesc) {
-        ListUserActions.add(new UserAction(ActionCount, new Date(), ActionDesc));
+        UserAction userAction = new UserAction(ActionCount, new Date().toString(), ActionDesc);
+        ListUserActions.add(userAction);
+        db.addUserAction(userAction);
         ActionCount++;
         userActionListAdapter.notifyDataSetChanged();
     }
